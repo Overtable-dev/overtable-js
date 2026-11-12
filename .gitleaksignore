@@ -1,0 +1,4 @@
+# Verified test fixtures, one gitleaks fingerprint per line (gitleaks dir, paths from the repository root).
+# packages/shared/src/crypto.test.ts lines 104 and 105: the public Standard Webhooks spec test vector
+packages/shared/src/crypto.test.ts:generic-api-key:104
+packages/shared/src/crypto.test.ts:generic-api-key:105

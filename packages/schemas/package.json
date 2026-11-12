@@ -1,0 +1,40 @@
+{
+  "name": "@overtable/schemas",
+  "version": "0.1.0",
+  "private": true,
+  "description": "The public shapes of Overtable's typed exchanges and requests, as Zod schemas, TypeScript types and JSON Schema.",
+  "type": "module",
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js"
+    },
+    "./json-schema/*": "./dist/json-schema/*"
+  },
+  "files": [
+    "dist"
+  ],
+  "scripts": {
+    "build": "tsc -p tsconfig.json",
+    "typecheck": "tsc -p tsconfig.json --noEmit",
+    "lint": "tsc -p tsconfig.json --noEmit",
+    "test": "vitest run"
+  },
+  "engines": {
+    "node": ">=20"
+  },
+  "dependencies": {
+    "zod": "^3.25.0"
+  },
+  "devDependencies": {
+    "@overtable/shared": "*",
+    "@types/node": "^22.13.10",
+    "ajv": "^8.17.1",
+    "typescript": "^5.8.2",
+    "vitest": "^3.0.9",
+    "zod-to-json-schema": "^3.24.6"
+  },
+  "license": "Apache-2.0"
+}

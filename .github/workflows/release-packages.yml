@@ -1,0 +1,148 @@
+# Publishes the five npm packages of scripts/publish/packages.json. By hand only, never on a push or a schedule.
+#
+#   dry-run on (default)   build, test, the publication checks below, then each package staged, packed with
+#                          npm pack, installed outside the checkout and type-checked. Publishes nothing.
+#   dry-run off            the same, then the job "publish" in the environment npm: it waits for a required
+#                          reviewer's approval, then publishes with npm trusted publishing (OIDC) and
+#                          npm publish --provenance --access public, in this order:
+#                          @overtable/schemas, @overtable/verify, @overtable/sdk, @overtable/mcp, overtable;
+#                          and pushes the tag packages-v<version>.
+#
+# The publication checks refuse a run when: the repository is private (npm makes provenance only from a public
+# repository), the run is not on main, packages.json names another repository, a CHANGELOG has no section for
+# the version, a package already has that version on npm, or (dry-run off) the environment npm has no required
+# reviewer.
+# Authentication: trusted publishing (OIDC, id-token: write). For the very first publication only, before the
+# packages exist on npm, a short-lived NPM_TOKEN secret in the environment npm, deleted right after.
+name: release-packages
+
+on:
+  workflow_dispatch:
+    inputs:
+      dry-run:
+        description: "Dry run: build, test, pack and check, publish nothing"
+        type: boolean
+        default: true
+      version:
+        description: "Version of the five packages, e.g. 0.1.0"
+        type: string
+        required: true
+        default: "0.1.0"
+      dist-tag:
+        description: "npm dist-tag (latest, or next for a pre-release)"
+        type: choice
+        options: [latest, next]
+        default: latest
+
+permissions:
+  contents: read
+
+concurrency:
+  group: release-packages
+  cancel-in-progress: false
+
+env:
+  # The publication order. A package comes after the ones it depends on; scripts/publish/packages.json must list
+  # the same order (checked below).
+  ORDER: "@overtable/schemas @overtable/verify @overtable/sdk @overtable/mcp overtable"
+
+jobs:
+  verify:
+    name: ${{ inputs.dry-run && 'dry run' || 'checks' }} ${{ inputs.version }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    permissions:
+      contents: read
+      actions: read # read the environment npm's protection rules
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+          cache: npm
+      - name: Publication checks
+        env:
+          VERSION: ${{ inputs.version }}
+          DRY_RUN: ${{ inputs.dry-run }}
+          PRIVATE: ${{ github.event.repository.private }}
+          REPO: ${{ github.server_url }}/${{ github.repository }}
+          REPO_NAME: ${{ github.repository }}
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          echo "$VERSION" | grep -Eq '^[0-9]+\.[0-9]+\.[0-9]+(-[0-9A-Za-z.-]+)?$' || { echo "::error::not a version: $VERSION"; exit 1; }
+          [ "$PRIVATE" = "false" ] || { echo "::error::$REPO is private: npm makes provenance only from a public repository"; exit 1; }
+          [ "$GITHUB_REF" = "refs/heads/main" ] || { echo "::error::run on main only, not $GITHUB_REF"; exit 1; }
+          node -e '
+            const c = require("./scripts/publish/packages.json");
+            const fs = require("fs");
+            const names = c.packages.map((p) => p.name).join(" ");
+            if (names !== process.env.ORDER) { console.error(`::error::packages.json lists ${names}, the publication order is ${process.env.ORDER}`); process.exit(1); }
+            if (c.repository.replace(/\/+$/, "") !== process.env.REPO) { console.error(`::error::packages.json names ${c.repository}, this run is ${process.env.REPO}`); process.exit(1); }
+            for (const p of c.packages) {
+              const log = fs.readFileSync(`packages/${p.workspace}/CHANGELOG.md`, "utf8");
+              if (!log.includes(`\n## ${process.env.VERSION}`)) { console.error(`::error::packages/${p.workspace}/CHANGELOG.md has no section ## ${process.env.VERSION}`); process.exit(1); }
+            }
+          '
+          for name in $ORDER; do
+            if npm view "$name@$VERSION" version >/dev/null 2>&1; then echo "::error::$name@$VERSION is already on npm"; exit 1; fi
+          done
+          if [ "$DRY_RUN" != "true" ]; then
+            reviewers=$(gh api "repos/$REPO_NAME/environments/npm" --jq '[.protection_rules[]? | select(.type == "required_reviewers") | .reviewers[]?] | length' 2>/dev/null || echo 0)
+            [ "${reviewers:-0}" -gt 0 ] || { echo "::error::the environment npm has no required reviewer: publishing needs a maintainer's approval"; exit 1; }
+          fi
+          echo "checks passed for $VERSION: $ORDER"
+      - run: npm ci --no-audit --no-fund
+      - name: Build
+        run: npm run build
+      - name: Test
+        run: npm test
+      - name: Stage, npm pack, install outside the checkout, type-check
+        env:
+          VERSION: ${{ inputs.version }}
+        run: node scripts/publish/dry-run.mjs --skip-tsc --no-relay --version "$VERSION"
+
+  publish:
+    name: publish ${{ inputs.version }} to npm
+    needs: verify
+    if: ${{ !inputs.dry-run }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    # Required reviewer: the job waits here for approval.
+    environment: npm
+    permissions:
+      contents: write # the packages-v<version> tag
+      id-token: write # npm provenance and trusted publishing
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+          registry-url: https://registry.npmjs.org
+      # Trusted publishing needs npm 11.5.1 or later; Node 22 ships npm 10.
+      - run: npm install -g npm@11.6.2
+      - run: npm ci --no-audit --no-fund
+      - name: Build and stage
+        env:
+          VERSION: ${{ inputs.version }}
+        run: |
+          npm run build
+          node scripts/publish/build.mjs --skip-tsc --version "$VERSION"
+      - name: Publish, in order
+        env:
+          # Empty once trusted publishing is set up: npm then authenticates with OIDC.
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+          TAG: ${{ inputs.dist-tag }}
+        run: |
+          for name in $ORDER; do
+            ws=$(node -e 'console.log(require("./scripts/publish/packages.json").packages.find((p) => p.name === process.argv[1]).workspace)' "$name")
+            echo "publishing $name from .publish/$ws"
+            (cd ".publish/$ws" && npm publish --provenance --access public --tag "$TAG")
+          done
+      - name: Tag
+        env:
+          VERSION: ${{ inputs.version }}
+        run: |
+          git tag "packages-v$VERSION"
+          git push origin "packages-v$VERSION"

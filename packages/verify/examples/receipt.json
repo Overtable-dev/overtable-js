@@ -1,0 +1,52 @@
+{
+  "payload": {
+    "format": "overtable-receipt-v1",
+    "id": "OT-7F3K",
+    "subject": {
+      "kind": "request_accept",
+      "requestId": "x_slot_example",
+      "requestType": "slot",
+      "contentHash": "3333333333333333333333333333333333333333333333333333333333333333",
+      "fields": {
+        "when": "2026-11-12T10:00:00.000Z",
+        "durationMinutes": 30
+      }
+    },
+    "parties": [
+      {
+        "botId": "b_example_visitor",
+        "botName": "Example visitor",
+        "handle": null,
+        "ownerHumanId": null,
+        "ownerName": null
+      },
+      {
+        "botId": "b_example_owner",
+        "botName": "Example door",
+        "handle": "example",
+        "ownerHumanId": "h_example",
+        "ownerName": "Example owner"
+      }
+    ],
+    "authority": {
+      "method": "passkey",
+      "humanId": "h_example",
+      "version": 2
+    },
+    "decisions": [
+      {
+        "id": "OT-D3C1",
+        "receiptHash": "85aafb033fb7f00321b814587a8e0869f4ca3422f5b71e9118492866f14c164c"
+      }
+    ],
+    "createdAt": "2026-11-07T10:00:01.000Z",
+    "prevReceiptHash": null
+  },
+  "receiptHash": "96750780a88d3ee40bf9eea8e68031cc060f036526bbae060c21f312fa692d43",
+  "signature": {
+    "alg": "Ed25519",
+    "kid": "example-1",
+    "publicKey": "MCowBQYDK2VwAyEA-mj4eGdzs2pmA-aiRnb9NZTMkhby8CXlZ-Npt11FYJE",
+    "signature": "xwlq81CftYsufcG6cSaTu_ieKMMU3YRMRtDe-sOWBE5L7Ao7uNwKSuGwiPIHT3PldMAGfSy-Q88u1aWUieMpDA"
+  }
+}
