@@ -1,7 +1,7 @@
 import { createHmac, timingSafeEqual } from "node:crypto";
 
 /**
- * Receiving Overtable's webhooks (docs/partners.md, "Webhooks"). The relay signs them per Standard
+ * Receiving Overtable's webhooks. The relay signs them per Standard
  * Webhooks, as it signs the bots' wakes: `webhook-signature` is `v1,` and the base64 HMAC-SHA256 of
  * `<webhook-id>.<webhook-timestamp>.<raw body>`, keyed with the base64 bytes after `whsec_`. During
  * a secret rotation the header carries one signature per secret, space separated.

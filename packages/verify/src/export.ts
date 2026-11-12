@@ -2,7 +2,7 @@ import { parseReceipt, verifyReceipt, type SignedReceipt, type VerifyReceiptOpti
 
 /**
  * The owner's export of receipts (`overtable-receipt-export-v1`, /app/receipts/export.json), checked
- * offline as the relay checks it (packages/relay/src/receipts/export.ts, verifyReceiptExport): every
+ * offline as the relay checks it: every
  * receipt's hash and signature, each trace's receipt step against the receipt it ends with, and each
  * thread's chain (each receipt names the hash of the one before), so a receipt taken out of the
  * middle of a thread shows. Only the receipts are signed; the traces and disputes beside them are the

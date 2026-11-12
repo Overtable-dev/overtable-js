@@ -10,7 +10,8 @@
 #
 # The publication checks refuse a run when: the repository is private (npm makes provenance only from a public
 # repository), the run is not on main, packages.json names another repository, a CHANGELOG has no section for
-# the version, a package already has that version on npm, or (dry-run off) the environment npm has no required
+# the version, a package already has that version on npm, or, dry-run off, a CHANGELOG heading for the version
+# is not dated "## <version> (yyyy-mm-dd)" (it still says "unreleased") or the environment npm has no required
 # reviewer.
 # Authentication: trusted publishing (OIDC, id-token: write). For the very first publication only, before the
 # packages exist on npm, a short-lived NPM_TOKEN secret in the environment npm, deleted right after.
@@ -76,14 +77,16 @@ jobs:
           [ "$GITHUB_REF" = "refs/heads/main" ] || { echo "::error::run on main only, not $GITHUB_REF"; exit 1; }
           node -e '
             const c = require("./scripts/publish/packages.json");
-            const fs = require("fs");
             const names = c.packages.map((p) => p.name).join(" ");
             if (names !== process.env.ORDER) { console.error(`::error::packages.json lists ${names}, the publication order is ${process.env.ORDER}`); process.exit(1); }
             if (c.repository.replace(/\/+$/, "") !== process.env.REPO) { console.error(`::error::packages.json names ${c.repository}, this run is ${process.env.REPO}`); process.exit(1); }
-            for (const p of c.packages) {
-              const log = fs.readFileSync(`packages/${p.workspace}/CHANGELOG.md`, "utf8");
-              if (!log.includes(`\n## ${process.env.VERSION}`)) { console.error(`::error::packages/${p.workspace}/CHANGELOG.md has no section ## ${process.env.VERSION}`); process.exit(1); }
-            }
+          '
+          # Every run: a CHANGELOG section for the version. Dry-run off: its heading dated, never "unreleased".
+          node --input-type=module -e '
+            import { changelogProblems, loadConfig } from "./scripts/publish/build.mjs";
+            const problems = changelogProblems(loadConfig(), process.env.VERSION, { release: process.env.DRY_RUN !== "true" });
+            for (const p of problems) console.error(`::error::${p}`);
+            if (problems.length) process.exit(1);
           '
           for name in $ORDER; do
             if npm view "$name@$VERSION" version >/dev/null 2>&1; then echo "::error::$name@$VERSION is already on npm"; exit 1; fi

@@ -1,5 +1,5 @@
 /**
- * @overtable/verify: check Overtable's signed receipts offline (docs/protocol/receipts.md). No
+ * @overtable/verify: check Overtable's signed receipts offline. No
  * network, no database, no dependency beyond Node's own crypto. The same steps and failure codes
  * as the relay's verifier and its `overtable-receipt-verify` command.
  */

@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 /**
  * overtable-verify: the offline check of signed Overtable receipts, with the same arguments, lines
- * and exit codes as the relay's `overtable-receipt-verify` (packages/relay/src/receipts/verify-cli.ts).
+ * and exit codes as the relay's `overtable-receipt-verify`.
  *
  *   overtable-verify receipt.json [decision.json ...] [--public-key <spki-base64url>]
  *   overtable-verify overtable-receipts-OT-7F3K.json      (an owner's export, /app/receipts/export.json)

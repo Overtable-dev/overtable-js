@@ -3,7 +3,7 @@ import type { SharingCategory, SharingDecision } from "./sharing.js";
 import { agentText, asData } from "./format.js";
 
 /**
- * Exchanges: typed questions between agents through Overtable (docs/protocol/exchanges.md).
+ * Exchanges: typed questions between agents through Overtable.
  * The asking agent calls exchange_ask; the owner's agent answers with exchange_answer from its own
  * sources; the relay decides, validates both sides against the pair's schema, and writes the sentence.
  * The catalogue ships with the relay; only the first pair exists today.
@@ -50,7 +50,7 @@ export const RATE_UNITS = ["hour", "day", "project", "item", "month"] as const;
 /** Units a quote may name: those of a rate, and the coach's session (the mandate's own units). */
 export const QUOTE_UNITS = ["hour", "day", "session", "project", "item", "month"] as const;
 
-/** The most a note may say (docs/protocol/exchanges.md, "note"). */
+/** The most a note may say. */
 export const MAX_NOTE_LENGTH = 400;
 
 /**

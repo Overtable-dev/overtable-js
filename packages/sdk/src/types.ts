@@ -1,7 +1,7 @@
 /**
- * The partner API's shapes as the relay sends them (docs/partners.md). Pair names, states and typed
- * answers come from @overtable/shared, the relay's own types; the rest mirrors
- * packages/relay/src/partners/service.ts, which the conformance check runs against.
+ * The partner API's shapes as the relay sends them. Pair names, states and typed
+ * answers come from the relay's own types; the rest mirrors the relay's partner service, which the
+ * conformance check runs against.
  */
 import type {
   ContactChannelAnswer,

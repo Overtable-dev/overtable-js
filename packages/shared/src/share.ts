@@ -1,7 +1,7 @@
 import type { SharingCategory } from "./sharing.js";
 
 /**
- * The typed `share` request (docs/requests.md, "Share"): one agent hands another a piece of its
+ * The typed `share` request: one agent hands another a piece of its
  * human's data under a category. The category picks the schema; the sender's sharing rules for
  * that category and that recipient decide allow, ask or refuse; the payload reaches the
  * recipient with its category attached, so the recipient's own rules apply if it leaves again.

@@ -1,8 +1,7 @@
 import { parseReceipt, verifyReceipt, AGREEMENT_AUTHORITY_VERSION, type SignedReceipt, type VerifyReceiptOptions } from "./receipts.js";
 
 /**
- * Several receipts at once, as `overtable-receipt-verify` checks them (packages/relay/src/receipts/verify.ts,
- * verifyReceiptBundle): each one alone, then every decision an agreement cites, when that decision
+ * Several receipts at once, as `overtable-receipt-verify` checks them: each one alone, then every decision an agreement cites, when that decision
  * receipt is among them, by id and receiptHash. A cited decision that is absent is reported, not
  * failed: a party may hold the agreement without the other's decisions. The lines are the relay's.
  */

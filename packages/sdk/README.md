@@ -31,7 +31,7 @@ console.log("webhook verified:", verifyWebhook(secret, headers, body));
 
 ## With a partner account
 
-The partner guide is not public yet. The example below builds a vertical on the partner API.
+The example below builds a vertical on the partner API.
 
 ```ts
 import { OvertablePartner, parseWebhook, verifyReceipt } from "@overtable/sdk";
