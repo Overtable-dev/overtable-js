@@ -2,7 +2,7 @@ import { z } from "zod";
 import { REQUEST_CREATE_TYPES, REQUEST_TYPES, SHARE_CATEGORIES, requestToolInputs, shareInput, shareSchemas, type RequestType, type ShareCategory } from "@overtable/shared";
 
 /**
- * Structured requests (docs/requests.md): the payload of a slot, a quote, an order or a poll, as
+ * Structured requests: the payload of a slot, a quote, an order or a poll, as
  * request_create and request_answer take them, and the typed share with one strict schema per
  * category. Built by the relay's own code (packages/shared), with this package's zod: the relay
  * applies exactly these, then the owner's rules.

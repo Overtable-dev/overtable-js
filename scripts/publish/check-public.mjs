@@ -10,6 +10,10 @@
 //     @overtable/* that is not a folder of packages/), and a relative import or a new URL() on import.meta.url
 //     that leaves the tree or points at a file that is not there;
 //   - the owner's name, in any file. The words are kept as SHA-256 hashes so this file does not print them;
+//   - status wording in Markdown, in .d.ts files and in the comments of code (they become the JSDoc of the
+//     published .d.ts): a "not <public, published, verified, ready...> yet" sentence, or "coming" + "soon".
+//     Public text says what the package does, never where the project stands. Strings of code are product
+//     text (a "not tested" + "yet" label of a connection is a state the user sees), so they are not read;
 //   - in Markdown: roadmap content, and dates outside fenced code blocks (a protocol version in a quickstart is
 //     code), except the date of a CHANGELOG version heading: "## 1.2.3 (yyyy-mm-dd)".
 // Secrets are the job of gitleaks, run next to this script (`gitleaks dir`).
@@ -31,6 +35,9 @@ const NAME_HASHES = new Set([
 const ROADMAP = /\broad ?map\b|scenarios\.md|\bwave [0-9]\b|\bYC\b|Y Combinator/i;
 const MONTHS = "January|February|March|April|May|June|July|August|September|October|November|December";
 const DATES = [/\b(19|20)\d\d-\d\d-\d\d\b/, new RegExp(`\\b(${MONTHS}) \\d{1,2},? (19|20)\\d\\d\\b`), new RegExp(`\\b\\d{1,2} (${MONTHS}) (19|20)\\d\\d\\b`)];
+/** A "not <status> yet" sentence: not public, nothing is published, has not been verified... + yet; or "coming" + "soon". */
+export const STATUS =
+  /\b(?:not|nothing|isn't|aren't|wasn't|weren't|hasn't|haven't)\s+(?:[a-z]+\s+){0,2}?(?:public|published|released|verified|tested|available|supported|ready|implemented|shipped|live|done|documented|stable|finished|complete)\s+yet\b|\bcoming soon\b/i;
 const CHANGELOG_HEADING = /^##\s+\d+\.\d+\.\d+(-[0-9A-Za-z.-]+)?\s+\((19|20)\d\d-\d\d-\d\d\)\s*$/;
 
 function walk(dir) {
@@ -60,6 +67,38 @@ function resolveRelative(from, spec) {
   const candidates = [base, base.replace(/\.js$/, ".ts"), base.replace(/\.mjs$/, ".mts"), `${base}.ts`, `${base}.js`, join(base, "index.ts"), join(base, "index.js")];
   for (const c of candidates) if (existsSync(c)) return c;
   return null;
+}
+
+/**
+ * The comment text of each line of a source file ("" when the line has none): block comments, JSDoc and
+ * line comments. A "//" inside a string, as in a URL, may be read as a comment: it only adds text to check.
+ */
+export function commentsOf(lines) {
+  let inBlock = false;
+  return lines.map((line) => {
+    let out = "";
+    let rest = line;
+    while (rest.length) {
+      if (inBlock) {
+        const end = rest.indexOf("*/");
+        out += ` ${end < 0 ? rest : rest.slice(0, end)}`;
+        if (end < 0) break;
+        inBlock = false;
+        rest = rest.slice(end + 2);
+        continue;
+      }
+      const block = rest.indexOf("/*");
+      const lineComment = rest.indexOf("//");
+      if (lineComment >= 0 && (block < 0 || lineComment < block)) {
+        out += ` ${rest.slice(lineComment + 2)}`;
+        break;
+      }
+      if (block < 0) break;
+      inBlock = true;
+      rest = rest.slice(block + 2);
+    }
+    return out.trim();
+  });
 }
 
 export function nameWords(text) {
@@ -93,6 +132,12 @@ export function checkTree(dir) {
       // The words are not printed: the log of a public check must not spell them out either.
       if (nameWords(line).length) problems.push(`${rel}:${i + 1}: the owner's name`);
     });
+    if (CODE.has(ext) || ext === ".md") {
+      const read = ext === ".md" || rel.endsWith(".d.ts") ? lines : commentsOf(lines);
+      read.forEach((line, i) => {
+        if (line && STATUS.test(line)) problems.push(`${rel}:${i + 1}: status wording ("not ... yet")`);
+      });
+    }
     if (CODE.has(ext)) {
       for (const spec of specifiersOf(text)) {
         if (spec.startsWith(".")) {
@@ -132,5 +177,5 @@ if (isMain) {
     console.error(`check-public: ${problems.length} problem(s) in ${dir}:\n  ${problems.join("\n  ")}`);
     process.exit(1);
   }
-  console.log(`check-public: no private import, no owner's name, no roadmap content and no date in ${dir}`);
+  console.log(`check-public: no private import, no owner's name, no roadmap content, no status wording and no date in ${dir}`);
 }

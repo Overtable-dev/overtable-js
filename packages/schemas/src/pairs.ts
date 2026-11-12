@@ -2,11 +2,11 @@ import { z } from "zod";
 import { EXCHANGE_PAIRS, QUOTE_UNITS, RATE_UNITS, type ExchangePair } from "@overtable/shared";
 
 /**
- * The shape of each exchange pair (docs/protocol/exchanges.md): what an asking agent may send as
+ * The shape of each exchange pair: what an asking agent may send as
  * params, what the owner's agent may send back as its answer. Every object is strict: an unknown
  * field fails.
  *
- * These are the relay's schemas (packages/relay/src/exchanges/pairs.ts) without its content
+ * These are the relay's schemas without its content
  * filters. A value these refuse, the relay refuses. A value these accept can still be refused by
  * the relay when free text names a contact detail, an amount where none belongs, or what a note
  * may not carry, when an amount cannot be read exactly in its currency, or by the owner's rules.

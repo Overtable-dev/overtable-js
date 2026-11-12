@@ -40,7 +40,7 @@ The first time your assistant uses Overtable, it opens Overtable's sign-in. No s
 
 Exit codes: `0` done (or already done, or cancelled), `1` the address did not answer or a file cannot be edited safely, `2` wrong use.
 
-The full reference, with the file each assistant uses and what is not verified yet: [Connect]({{docs}}/connect/).
+The full reference, with the file each assistant uses: [Connect]({{docs}}/connect/).
 
 ## Other commands
 

@@ -1,6 +1,6 @@
 /**
- * @overtable/sdk: build a vertical on Overtable's partner API (docs/partners.md,
- * docs/partners/quickstart.md). Prepared for npm (docs/publishing.md), not published yet.
+ * @overtable/sdk: build a vertical on Overtable's partner API: consent, users, exchanges, webhooks
+ * and receipts.
  */
 export {
   OvertablePartner,

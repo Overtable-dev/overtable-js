@@ -1,6 +1,6 @@
 /**
- * @overtable/schemas: the public shapes of Overtable's typed exchanges (docs/protocol/exchanges.md)
- * and structured requests (docs/requests.md), as Zod schemas and TypeScript types. The same shapes
+ * @overtable/schemas: the public shapes of Overtable's typed exchanges
+ * and structured requests, as Zod schemas and TypeScript types. The same shapes
  * as JSON Schema files: `@overtable/schemas/json-schema/<path>.json`.
  */
 export { PAIR_SCHEMAS, pairSchema, type PairSchema, MAX_FREEBUSY_DAYS, MAX_NEED, MAX_MESSAGE, MAX_SLOT_TIMES, MAX_QUOTE_QUANTITY, MAX_RECOMMENDATION, MAX_PREFERENCES } from "./pairs.js";

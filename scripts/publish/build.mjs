@@ -26,6 +26,31 @@ export function loadConfig() {
   return JSON.parse(readFileSync(CONFIG_PATH, "utf8"));
 }
 
+const escapeRe = (s) => s.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+
+/**
+ * What is wrong with a CHANGELOG for a version, or null. Every run needs a section `## <version>`; a real
+ * publication (release: true) needs its heading dated, `## <version> (yyyy-mm-dd)`, so a heading that still
+ * says "unreleased" never ships in a tarball.
+ */
+export function changelogProblem(text, version, { release = false } = {}) {
+  const heading = text.split("\n").find((line) => new RegExp(`^##\\s+${escapeRe(version)}(\\s|$)`).test(line));
+  if (!heading) return `has no section ## ${version}`;
+  if (release && !new RegExp(`^##\\s+${escapeRe(version)}\\s+\\((19|20)\\d\\d-\\d\\d-\\d\\d\\)\\s*$`).test(heading.trimEnd()))
+    return `heading "${heading.trim()}" is not "## ${version} (yyyy-mm-dd)": date it before a real publication`;
+  return null;
+}
+
+/** The CHANGELOG problems of every package of packages.json for a version, one line each. */
+export function changelogProblems(config, version, options) {
+  return config.packages.flatMap((p) => {
+    const path = join(ROOT, "packages", p.workspace, "CHANGELOG.md");
+    if (!existsSync(path)) return [`packages/${p.workspace}/CHANGELOG.md is missing`];
+    const problem = changelogProblem(readFileSync(path, "utf8"), version, options);
+    return problem ? [`packages/${p.workspace}/CHANGELOG.md ${problem}`] : [];
+  });
+}
+
 const readJson = (p) => JSON.parse(readFileSync(p, "utf8"));
 const workspaceManifest = (ws) => readJson(join(ROOT, "packages", ws, "package.json"));
 const isBuiltin = (id) => id.startsWith("node:") || builtinModules.includes(id.split("/")[0]);
@@ -114,6 +139,11 @@ export function checkStaged(dir, manifest) {
     if (/\.(test|spec)\.|\.map$|(^|\/)src\/|\.tsbuildinfo$|(^|\/)\.env/.test(rel)) problems.push(`private or build file ${rel}`);
     if (!/\.(m?js|d\.ts)$/.test(file)) continue;
     const text = readFileSync(file, "utf8");
+    // The JSDoc of the types is what a user reads in the editor: no path to a file of the private repository.
+    if (file.endsWith(".d.ts"))
+      text.split("\n").forEach((line, i) => {
+        if (/\bdocs\/[\w./-]+\.md\b|\bpackages\/(relay|conformance)\//.test(line)) problems.push(`${rel}:${i + 1} names a file of the private repository`);
+      });
     for (const id of importsOf(text)) {
       if (isBuiltin(id)) continue;
       const name = packageOf(id);

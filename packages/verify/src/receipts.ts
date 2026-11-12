@@ -1,9 +1,9 @@
 import { createHash, createPublicKey, verify, type KeyObject } from "node:crypto";
 
 /**
- * Overtable's signed receipts (docs/protocol/receipts.md), checked offline: no network, no
+ * Overtable's signed receipts, checked offline: no network, no
  * database. The same steps, in the same order and with the same failure codes, as the relay's
- * verifier (packages/relay/src/receipts/verify.ts, used by `overtable-receipt-verify` and by the
+ * verifier (used by `overtable-receipt-verify` and by the
  * public check behind /verify): the format, receiptHash against the canonical payload, the Ed25519
  * signature, then the subject's shape. The tests of @overtable/verify run both on the same receipts.
  *

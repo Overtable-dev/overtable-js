@@ -25,7 +25,7 @@ import type {
 } from "./types.js";
 
 /**
- * A client of Overtable's partner API (docs/partners.md). It carries calls; it decides nothing.
+ * A client of Overtable's partner API. It carries calls; it decides nothing.
  * The user's rules, their confirmations and the receipts stay on the relay: an answer the user's
  * mandate holds waits for them whatever the SDK sends, and no call here widens a mandate or
  * commits the user.
