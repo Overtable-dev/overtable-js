@@ -1,0 +1,27 @@
+{
+  "name": "overtable-js",
+  "private": true,
+  "version": "0.1.0",
+  "description": "Sources of the Overtable npm packages, published from this repository with provenance",
+  "type": "module",
+  "workspaces": [
+    "packages/*"
+  ],
+  "scripts": {
+    "build": "npm run build -w @overtable/shared && npm run build -w @overtable/verify && npm run build -w @overtable/schemas && npm run build -w @overtable/sdk && npm run build -w @overtable/mcp && npm run build -w @overtable/cli",
+    "typecheck": "npm run typecheck -w @overtable/shared && npm run typecheck -w @overtable/verify && npm run typecheck -w @overtable/schemas && npm run typecheck -w @overtable/sdk && npm run typecheck -w @overtable/mcp && npm run typecheck -w @overtable/cli",
+    "test": "npm run test -w @overtable/shared && npm run test -w @overtable/verify && npm run test -w @overtable/schemas && npm run test -w @overtable/sdk && npm run test -w @overtable/mcp && npm run test -w @overtable/cli",
+    "check": "node scripts/publish/check-public.mjs",
+    "stage": "node scripts/publish/build.mjs --skip-tsc",
+    "dry-run": "node scripts/publish/dry-run.mjs --skip-tsc --no-relay"
+  },
+  "engines": {
+    "node": ">=20"
+  },
+  "license": "Apache-2.0",
+  "devDependencies": {
+    "esbuild": "^0.28.2",
+    "rollup": "^4.65.0",
+    "rollup-plugin-dts": "^6.5.1"
+  }
+}

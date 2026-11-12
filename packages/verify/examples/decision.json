@@ -1,0 +1,37 @@
+{
+  "payload": {
+    "format": "overtable-receipt-v1",
+    "id": "OT-D3C1",
+    "subject": {
+      "kind": "decision",
+      "decision": "approved",
+      "actionType": "commitment",
+      "itemId": "x_slot_example",
+      "contentHash": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+      "method": "passkey",
+      "presentedAt": "2026-11-07T09:59:40.000Z",
+      "decidedAt": "2026-11-07T10:00:00.000Z"
+    },
+    "parties": [
+      {
+        "botId": "b_example_owner",
+        "botName": "Example door",
+        "ownerHumanId": "h_example",
+        "ownerName": "Example owner"
+      }
+    ],
+    "authority": {
+      "method": "bot_owner",
+      "humanId": "h_example"
+    },
+    "createdAt": "2026-11-07T10:00:00.000Z",
+    "prevReceiptHash": null
+  },
+  "receiptHash": "85aafb033fb7f00321b814587a8e0869f4ca3422f5b71e9118492866f14c164c",
+  "signature": {
+    "alg": "Ed25519",
+    "kid": "example-1",
+    "publicKey": "MCowBQYDK2VwAyEA-mj4eGdzs2pmA-aiRnb9NZTMkhby8CXlZ-Npt11FYJE",
+    "signature": "CWKr4Ws3xyQMGB3XcuCL8kR7qgFgQkO0ovNSJBMsk0tFIHrEWr9zPK526IBWZw4YCcq9aWOL__e-mTPqYIQ3BQ"
+  }
+}

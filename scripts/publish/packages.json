@@ -1,0 +1,57 @@
+{
+  "$comment": "The npm packages built from this repository (docs/publishing.md). Names, licence, repository and the docs address the READMEs link to ({{docs}}) are the owner's to change here, and only here: scripts/publish/build.mjs writes every published package.json from this file. Order is the publication order: a package comes after the ones it depends on.",
+  "version": "0.1.0",
+  "license": "Apache-2.0",
+  "repository": "https://github.com/Overtable-dev/overtable-js",
+  "homepage": "https://overtable.dev",
+  "bugs": "https://github.com/Overtable-dev/overtable-js/issues",
+  "docs": "https://overtable.dev/docs",
+  "author": "Overtable",
+  "packages": [
+    {
+      "workspace": "schemas",
+      "name": "@overtable/schemas",
+      "description": "The public shapes of Overtable's typed exchanges and requests, as Zod schemas, TypeScript types and JSON Schema.",
+      "keywords": ["overtable", "ai-agents", "mcp", "zod", "json-schema"],
+      "entries": { ".": "src/index.ts" },
+      "jsonSchema": true,
+      "dependencies": ["zod"]
+    },
+    {
+      "workspace": "verify",
+      "name": "@overtable/verify",
+      "description": "Offline verification of Overtable's signed receipts: no network, no database, no run-time dependency.",
+      "keywords": ["overtable", "receipts", "ed25519", "verification"],
+      "entries": { ".": "src/index.ts" },
+      "bin": { "overtable-verify": "src/bin.ts" },
+      "dependencies": [],
+      "assets": ["examples"]
+    },
+    {
+      "workspace": "sdk",
+      "name": "@overtable/sdk",
+      "description": "TypeScript SDK for Overtable's partner API: consent, users, exchanges, webhooks and receipts.",
+      "keywords": ["overtable", "sdk", "oauth", "webhooks", "ai-agents"],
+      "entries": { ".": "src/index.ts" },
+      "dependencies": ["@overtable/verify"]
+    },
+    {
+      "workspace": "mcp",
+      "name": "@overtable/mcp",
+      "description": "A local MCP server (stdio or streamable HTTP) that gives an assistant its Overtable bot's tools with a bot API key.",
+      "keywords": ["overtable", "mcp", "model-context-protocol", "ai-agents"],
+      "entries": { ".": "src/index.ts" },
+      "bin": { "overtable-mcp": "src/cli.ts" },
+      "dependencies": ["@modelcontextprotocol/sdk", "express", "zod"]
+    },
+    {
+      "workspace": "cli",
+      "name": "overtable",
+      "description": "The Overtable command line: connect your assistant (npx overtable connect), manage a bot, its contacts and its rules.",
+      "keywords": ["overtable", "cli", "mcp", "claude-code", "codex", "ai-agents"],
+      "entries": { ".": "src/index.ts" },
+      "bin": { "overtable": "src/bin.ts" },
+      "dependencies": ["http-proxy-agent", "https-proxy-agent", "socks-proxy-agent"]
+    }
+  ]
+}

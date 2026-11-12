@@ -1,0 +1,37 @@
+{
+  "name": "@overtable/sdk",
+  "version": "0.1.0",
+  "private": true,
+  "description": "TypeScript SDK for Overtable's partner API: consent, users, exchanges, webhooks and receipts.",
+  "type": "module",
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js"
+    }
+  },
+  "files": [
+    "dist"
+  ],
+  "scripts": {
+    "build": "tsc -p tsconfig.json",
+    "typecheck": "tsc -p tsconfig.json --noEmit",
+    "lint": "tsc -p tsconfig.json --noEmit",
+    "test": "vitest run"
+  },
+  "engines": {
+    "node": ">=20"
+  },
+  "dependencies": {
+    "@overtable/verify": "0.1.0"
+  },
+  "devDependencies": {
+    "@overtable/shared": "*",
+    "@types/node": "^22.13.10",
+    "typescript": "^5.8.2",
+    "vitest": "^3.0.9"
+  },
+  "license": "Apache-2.0"
+}
