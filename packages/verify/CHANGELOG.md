@@ -2,7 +2,7 @@
 
 The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/). Versions follow [Semantic Versioning](https://semver.org/); before 1.0.0, a minor version may break the API.
 
-## 0.1.0 (unreleased)
+## 0.1.0 (2026-11-14)
 
 First publication on npm.
 
